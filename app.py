@@ -154,32 +154,36 @@ st.markdown("---")
 # Инициализация модели (выполняется один раз благодаря кэшированию Streamlit)
 model = setup_gemini_api()
 
-# Форма для ввода данных
-with st.form("analysis_form", clear_on_submit=False):
-    st.subheader("Входные данные")
-    
-    # Текстовое поле для описания задачи (большое поле для ввода)
-    task_description = st.text_area(
-        "Описание задачи (от учителя)",
-        height=200,
-        placeholder="Введите описание задачи или вопроса, который был задан ученику...",
-        help="Опишите задачу, которую должен решить ученик"
-    )
-    
-    # Текстовое поле для ответа ученика (большое поле для ввода)
-    student_answer = st.text_area(
-        "Ответ ученика",
-        height=200,
-        placeholder="Введите ответ ученика для анализа...",
-        help="Вставьте ответ ученика, который нужно проанализировать"
-    )
-    
-    # Кнопка анализа
-    analyze_button = st.form_submit_button(
-        "🔍 Анализировать",
-        use_container_width=True,
-        type="primary"
-    )
+# Инициализация session_state для сохранения результатов
+if "analysis_result" not in st.session_state:
+    st.session_state.analysis_result = None
+
+st.subheader("Входные данные")
+
+# Текстовое поле для описания задачи (большое поле для ввода)
+task_description = st.text_area(
+    "Описание задачи (от учителя)",
+    height=200,
+    placeholder="Введите описание задачи или вопроса, который был задан ученику...",
+    help="Опишите задачу, которую должен решить ученик",
+    key="task_description"
+)
+
+# Текстовое поле для ответа ученика (большое поле для ввода)
+student_answer = st.text_area(
+    "Ответ ученика",
+    height=200,
+    placeholder="Введите ответ ученика для анализа...",
+    help="Вставьте ответ ученика, который нужно проанализировать",
+    key="student_answer"
+)
+
+# Кнопка анализа
+analyze_button = st.button(
+    "🔍 Анализировать",
+    use_container_width=True,
+    type="primary"
+)
 
 # Обработка нажатия кнопки анализа
 if analyze_button:
@@ -197,15 +201,20 @@ if analyze_button:
                 # Выполняем анализ
                 analysis_result = analyze_answer(model, task_description, student_answer)
                 
-                # Отображаем результат в информационном блоке
-                st.markdown("---")
-                st.subheader("📊 Результат анализа")
-                st.info(analysis_result)
+                # Сохраняем результат в session_state
+                st.session_state.analysis_result = analysis_result
                 
             except Exception as e:
                 # Обработка ошибок при запросе к API
+                st.session_state.analysis_result = None
                 st.error(f"❌ Произошла ошибка при анализе: {str(e)}")
                 st.info("💡 Проверьте подключение к интернету и настройки API ключа.")
+
+# Отображаем результат анализа (если есть)
+if st.session_state.analysis_result:
+    st.markdown("---")
+    st.subheader("📊 Результат анализа")
+    st.info(st.session_state.analysis_result)
 
 # Футер с подсказкой
 st.markdown("---")
