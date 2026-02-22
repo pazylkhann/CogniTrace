@@ -5,7 +5,7 @@ CogniTrace - Анализ ошибок рассуждений учащихся
 """
 
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 
 # ============================================================================
 # КОНФИГУРАЦИЯ СТРАНИЦЫ
@@ -21,25 +21,18 @@ st.set_page_config(
 # ============================================================================
 # ФУНКЦИЯ НАСТРОЙКИ API
 # ============================================================================
-def setup_gemini_api():
+GEMINI_MODEL = "gemini-2.0-flash"
+
+
+def setup_gemini_client():
     """
-    Настраивает API для Google Gemini.
+    Создает клиент Google GenAI.
     Проверяет наличие API ключа в секретах Streamlit.
-    Возвращает настроенную модель или None при ошибке.
     """
     try:
-        # Получаем API ключ из секретов Streamlit
         api_key = st.secrets["GEMINI_API_KEY"]
-        
-        # Настраиваем API
-        genai.configure(api_key=api_key)
-        
-        # Создаем и возвращаем модель
-        model = genai.GenerativeModel("gemini-2.0-flash-exp")
-        return model
-        
+        return genai.Client(api_key=api_key)
     except KeyError:
-        # API ключ не найден в секретах
         st.warning("⚠️ API ключ не найден. Пожалуйста, добавьте GEMINI_API_KEY в секреты Streamlit.")
         st.info("💡 Для локальной разработки создайте файл `.streamlit/secrets.toml` и добавьте: GEMINI_API_KEY = 'ваш_ключ'")
         return None
@@ -94,27 +87,24 @@ def create_analysis_prompt(task_description: str, student_answer: str) -> str:
 # ============================================================================
 # ФУНКЦИЯ АНАЛИЗА ОТВЕТА
 # ============================================================================
-def analyze_answer(model, task_description: str, student_answer: str) -> str:
+def analyze_answer(client, task_description: str, student_answer: str) -> str:
     """
     Отправляет запрос к AI модели для анализа ответа ученика.
     
     Args:
-        model: Настроенная модель Gemini
+        client: Клиент Google GenAI
         task_description: Описание задачи от учителя
         student_answer: Ответ ученика
         
     Returns:
         Результат анализа от AI
-        
-    Raises:
-        Exception: При ошибках подключения или обработки запроса
     """
-    # Создаем промпт
     prompt = create_analysis_prompt(task_description, student_answer)
-    
-    # Отправляем запрос к модели
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+        )
         return response.text
     except Exception as e:
         raise Exception(f"Ошибка при обращении к AI модели: {str(e)}")
@@ -151,8 +141,7 @@ st.title("🚀 CogniTrace")
 st.markdown("### Анализ ошибок рассуждений с использованием сократического метода")
 st.markdown("---")
 
-# Инициализация модели (выполняется один раз благодаря кэшированию Streamlit)
-model = setup_gemini_api()
+client = setup_gemini_client()
 
 # Инициализация session_state для сохранения результатов
 if "analysis_result" not in st.session_state:
@@ -192,14 +181,12 @@ if analyze_button:
         st.warning("⚠️ Пожалуйста, введите описание задачи.")
     elif not student_answer.strip():
         st.warning("⚠️ Пожалуйста, введите ответ ученика.")
-    elif model is None:
+    elif client is None:
         st.warning("⚠️ API ключ не настроен. Невозможно выполнить анализ.")
     else:
-        # Показываем индикатор загрузки
         with st.spinner("🤔 Анализирую рассуждения ученика... Это может занять несколько секунд."):
             try:
-                # Выполняем анализ
-                analysis_result = analyze_answer(model, task_description, student_answer)
+                analysis_result = analyze_answer(client, task_description, student_answer)
                 
                 # Сохраняем результат в session_state
                 st.session_state.analysis_result = analysis_result
