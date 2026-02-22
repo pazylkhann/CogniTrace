@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   COGNITRACE — Cyberpunk/Linear Design System
+   Background: #030303 | Accents: #6366f1, #a855f7
+   ============================================ */
+
+@layer base {
+  :root {
+    --void: 0 0% 1%;
+    --primary: 238 90% 59%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 270 91% 65%;
+    --primary-deep: 238 90% 45%;
+    --background: 0 0% 1%;
+    --foreground: 0 0% 100%;
+    --muted-foreground: 215 20% 65%;
+    --card: 0 0% 3%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 3%;
+    --popover-foreground: 0 0% 100%;
+    --secondary: 240 10% 12%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 5% 12%;
+    --accent: 270 91% 65%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --success: 160 84% 39%;
+    --warning: 43 96% 56%;
+    --border: 0 0% 15%;
+    --input: 0 0% 12%;
+    --ring: 238 90% 59%;
+    --sidebar-background: 0 0% 2%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 12%;
+    --radius: 0.75rem;
+    --chart-1: 238 90% 59%;
+    --chart-2: 270 91% 65%;
+    --chart-3: 200 90% 50%;
+    --chart-4: 160 84% 39%;
+    --chart-5: 43 96% 56%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-white/10;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply text-foreground antialiased;
+    background: #030303;
+    font-family: 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.01em;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', system-ui, sans-serif;
+    @apply tracking-tight text-white font-semibold;
+  }
+  p, span {
+    color: inherit;
+  }
+}
+
+/* Mesh gradient background — slow-moving purple/blue blobs */
+.bg-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: #030303;
+  overflow: hidden;
+}
+.bg-mesh::before,
+.bg-mesh::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  animation: meshFloat 25s ease-in-out infinite;
+}
+.bg-mesh::before {
+  width: 600px;
+  height: 600px;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  top: -200px;
+  right: -100px;
+  animation-delay: 0s;
+}
+.bg-mesh::after {
+  width: 500px;
+  height: 500px;
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 50%);
+  bottom: -150px;
+  left: -100px;
+  animation-delay: -12s;
+}
+
+@keyframes meshFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.05); }
+  66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@layer components {
+  /* Glassmorphism — white/5, blur-xl, thin borders */
+  .glass-card {
+    @apply bg-white/[0.05] backdrop-blur-xl border border-white/10 shadow-xl;
+  }
+  .glass-panel {
+    @apply bg-black/40 backdrop-blur-xl border border-white/10;
+  }
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  }
+  .gradient-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  }
+  .glow-primary {
+    box-shadow: 0 0 40px -10px rgba(99, 102, 241, 0.5), 0 0 20px -5px rgba(168, 85, 247, 0.4);
+  }
+  .glow-neon {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.4), 0 0 40px rgba(168, 85, 247, 0.2);
+  }
+  /* Hover: juicy glow + scale */
+  .hover-glow {
+    @apply transition-all duration-300;
+  }
+  .hover-glow:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 30px -5px rgba(99, 102, 241, 0.4);
+  }
+  /* Terminal-style panel */
+    .terminal-panel {
+    @apply border-white/10 rounded-xl font-mono text-sm;
+    background: rgba(10, 10, 12, 0.8);
+    box-shadow: inset 0 0 60px -20px rgba(0,0,0,0.5);
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeSlideUp 0.5s ease-out forwards;
+  }
+  @keyframes fadeSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 20px -5px rgba(99, 102, 241, 0.3); }
+    50% { box-shadow: 0 0 35px -5px rgba(99, 102, 241, 0.6); }
+  }
+  .slide-in-right {
+    animation: slideInRight 0.3s ease-out forwards;
+  }
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}

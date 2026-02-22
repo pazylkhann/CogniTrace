@@ -1,0 +1,8 @@
+{
+  "installCommand": "cd logicbloom-coach && npm install",
+  "buildCommand": "cd logicbloom-coach && npm run build",
+  "outputDirectory": "logicbloom-coach/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

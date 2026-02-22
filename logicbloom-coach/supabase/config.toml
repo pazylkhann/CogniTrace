@@ -1,0 +1,13 @@
+project_id = "biozfpjehhjhgdmudort"
+
+[functions.analyze-cognitive-path]
+verify_jwt = false
+
+[functions.generate-parent-report]
+verify_jwt = false
+
+[functions.extract-handwriting]
+verify_jwt = false
+
+[functions.cognitive-processor]
+verify_jwt = false
