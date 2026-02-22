@@ -1,6 +1,5 @@
-# Файлы секретов и конфигурации
+# Файлы секретов
 .streamlit/secrets.toml
-.streamlit/**/*.toml
 
 # Python
 __pycache__/
@@ -25,5 +24,5 @@ venv.bak/
 .DS_Store
 Thumbs.db
 
-# Streamlit
-.streamlit/secrets.toml
+# Node
+node_modules/
